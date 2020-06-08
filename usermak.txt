@@ -1,4 +1,2 @@
-export CFLAGS += -fPIC -mcpu=arm1176jzf-s -mfpu=vfp 
--ffast-math -mfloat-abi=hard -mlittle-endian 
--munaligned-access -DPJ_HAS_IPV6=1
+export CFLAGS += -fPIC -mcpu=arm1176jzf-s -mfpu=vfp -ffast-math -mfloat-abi=hard -mlittle-endian -munaligned-access -DPJ_HAS_IPV6=1
 export LDFLAGS +=
