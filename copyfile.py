@@ -1,9 +1,7 @@
 import subprocess as sub
 import shlex
 
-process = sub.Popen(shlex.split("sudo cp /etc
-                    /wpa_supplicant/wpa_supplicant.conf 
-                    /boot"),
+process = sub.Popen(shlex.split("sudo cp /etc/wpa_supplicant/wpa_supplicant.conf /boot"),
                     stdout=sub.PIPE,
                     universal_newlines=True)
 
