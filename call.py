@@ -5,7 +5,7 @@ import RPi.GPIO as GPIO
 
 BUTTON = 17
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(BUTTON,GPIO.IN)
+GPIO.setup(BUTTON,GPIO.IN,pull_up_down=GPIO.PUD_UP)
 
 class ParseArgumennts():
     def parse(self,args=sys.argv[1:]):
@@ -127,7 +127,6 @@ try:
     # Init library with default config and some customized
     # logging config.
     lib.init(log_cfg = pj.LogConfig(level=LOG_LEVEL, callback=log_cb))
-
     # Create UDP transport which listens to any available port
     transport = lib.create_transport(pj.TransportType.UDP, 
                                      pj.TransportConfig(0))
@@ -139,7 +138,7 @@ try:
 
     # Create local account
     #acc = lib.create_account_for_transport(transport, cb=MyAccountCallback())
-    acc = lib.create_account(pj.AccountConfig(username=args.username, password=args.password, domain=args.realm, proxy=args.outbound))
+    acc = lib.create_account(pj.AccountConfig(domain=args.realm, username=args.username, password=args.password, proxy=args.outbound))
 
     # If argument is specified then make call to the URI
     if len(sys.argv) > 1:
@@ -157,9 +156,8 @@ try:
         input = GPIO.input(BUTTON)
 #        input = sys.stdin.readline().rstrip("\r\n")
         if input :
-
             lck = lib.auto_lock()
-            current_call = make_call(address = args.client)
+            current_call = make_call(address = args.clienta)
             del lck
 
 
