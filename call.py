@@ -26,7 +26,6 @@ class ParseArgumennts():
         parser.add_argument("--add-codec")
         parser.add_argument("--dis-codec", action="append")
         parser.add_argument("--clienta")
-        parser.add_argument("--clientb")
         options = parser.parse_args(args)
         return options
 
@@ -54,6 +53,14 @@ class MyAccountCallback(pj.AccountCallback):
             
         print "Incoming call from ", call.info().remote_uri
         print "Press 'a' to answer"
+        
+#        current_call = call
+
+#        call_cb = MyCallCallback(current_call)
+#        current_call.set_callback(call_cb)
+
+#        current_call.answer(180)
+
 
         client1=args.clienta
         client2=args.clientb
@@ -61,12 +68,12 @@ class MyAccountCallback(pj.AccountCallback):
             current_call = call
             call_cb = MyCallCallback(current_call)
             current_call.set_callback(call_cb)
-            current_call.answer(100)
-        else call.info().remote_uri == client2:
+            current_call.answer(200)
+        elif call.info().remote_uri == client2:
             current_call = call
             call_cb = MyCallCallback(current_call)
             current_call.set_callback(call_cb)
-            current_call.answer(100)
+            current_call.answer(200)
 
         
 # Callback to receive events from Call
