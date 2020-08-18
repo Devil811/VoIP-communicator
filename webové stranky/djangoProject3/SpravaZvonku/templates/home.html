@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="cz">
+<head>
+    <meta charset="UTF-8">
+    <title>Správa zvonku</title>
+</head>
+<body>
+    <button onclick="location.href='{% url 'script' %}'">Overit dostupnost</button><hr>
+    {% if data %}
+    {{ data | safe}}
+    {% endif %}
+<br><hr><br>
+<form action="/data/" method="post">
+    <input type="submit"value="Historie">
+    <br>
+    {% csrf_token %}
+    {% if out2 %}
+    {{ out2 | safe  }}
+    {% endif %}
+</form>
+</body>
+</html>

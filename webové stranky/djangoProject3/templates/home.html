@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="cz">
+<head>
+    <meta charset="UTF-8">
+    <title>Správa zvonku</title>
+</head>
+<body>
+    <form action="/ping/" method="post">
+    {% csrf_token %}
+    {{data_ping}}<br><br>
+    {{data}}
+    <br><br>
+    <input type="submit" value="Execute External Python Script">
+    </form>
+
+    <form action="/data/" method="post">
+    {% csrf_token %}
+    {{data_data}}<br><br>
+    {{data}}
+    <br><br>
+    <input type="submit" value="Execute External Python Script">
+    </form>
+</body>
+</html>
