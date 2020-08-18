@@ -1,11 +1,33 @@
+# $Id$
+#
+# SIP call sample.
+#
+# Copyright (C) 2003-2008 Benny Prijono <benny@prijono.org>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+#
+
 import sys
 import pjsua as pj
 import argparse
 import RPi.GPIO as GPIO
+import os.system
 
 BUTTON = 17
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(BUTTON,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(BUTTON,GPIO.IN)
 
 class ParseArgumennts():
     def parse(self,args=sys.argv[1:]):
@@ -25,7 +47,8 @@ class ParseArgumennts():
         parser.add_argument("--clock-rate")
         parser.add_argument("--add-codec")
         parser.add_argument("--dis-codec", action="append")
-        parser.add_argument("--clienta")
+        parser.add_argument("--client")
+        parser.add_argument("--client2")
         options = parser.parse_args(args)
         return options
 
@@ -36,7 +59,6 @@ current_call = None
 # Logging callback
 def log_cb(level, str, len):
     print str,
-
 
 # Callback to receive events from account
 class MyAccountCallback(pj.AccountCallback):
@@ -50,30 +72,18 @@ class MyAccountCallback(pj.AccountCallback):
         if current_call:
             call.answer(486, "Busy")
             return
-            
-        print "Incoming call from ", call.info().remote_uri
-        print "Press 'a' to answer"
-        
-#        current_call = call
-
-#        call_cb = MyCallCallback(current_call)
-#        current_call.set_callback(call_cb)
-
-#        current_call.answer(180)
-
-
-        client1=args.clienta
-        client2=args.clientb
+        client1=args.client
+        client2=args.client2
         if call.info().remote_uri == client1:
             current_call = call
             call_cb = MyCallCallback(current_call)
             current_call.set_callback(call_cb)
-            current_call.answer(200)
-        elif call.info().remote_uri == client2:
+            current_call.answer(100)
+        else call.info().remote_uri == client2
             current_call = call
             call_cb = MyCallCallback(current_call)
             current_call.set_callback(call_cb)
-            current_call.answer(200)
+            current_call.answer(100)
 
         
 # Callback to receive events from Call
@@ -90,13 +100,15 @@ class MyCallCallback(pj.CallCallback):
         print "last code =", self.call.info().last_code, 
         print "(" + self.call.info().last_reason + ")"
         
-        if self.call.info().state == pj.CallState.DISCONNECTED:
+        if self.call.info().state == 
+        pj.CallState.DISCONNECTED:
             current_call = None
             print 'Current call is', current_call
 
     # Notification when call's media state has changed.
     def on_media_state(self):
-        if self.call.info().media_state == pj.MediaState.ACTIVE:
+        if self.call.info().media_state == 
+        pj.MediaState.ACTIVE:
             # Connect the call to sound device
             call_slot = self.call.info().conf_slot
             pj.Lib.instance().conf_connect(call_slot, 0)
@@ -120,45 +132,44 @@ def make_call(uri):
 
 parser = ParseArgumennts()
 args = parser.parse()
-# Create library instance
+
 lib = pj.Lib()
 
 try:
-    # Init library with default config and some customized
-    # logging config.
-    lib.init(log_cfg = pj.LogConfig(level=LOG_LEVEL, callback=log_cb))
-    # Create UDP transport which listens to any available port
-    transport = lib.create_transport(pj.TransportType.UDP, 
-                                     pj.TransportConfig(0))
+
+    lib.init(log_cfg = pj.LogConfig(level=LOG_LEVEL,filename='/home/pi/log.txt',callback=log_cb))
+
+
+    transport = lib.create_transport(pj.TransportType.UDP,pj.TransportConfig(0))
     print "\nListening on", transport.info().host, 
     print "port", transport.info().port, "\n"
     
-    # Start the library
+
     lib.start()
 
-    # Create local account
-    #acc = lib.create_account_for_transport(transport, cb=MyAccountCallback())
-    acc = lib.create_account(pj.AccountConfig(domain=args.realm, username=args.username, password=args.password, proxy=args.outbound))
 
-    # If argument is specified then make call to the URI
+    acc = lib.create_account(pj.AccountConfig (username=args.username, password=args.password, domain=args.realm, proxy=args.outbound))
+
+
     if len(sys.argv) > 1:
         lck = lib.auto_lock()
         current_call = make_call(sys.argv[1])
         print 'Current call is', current_call
         del lck
 
-    my_sip_uri = "sip:" + transport.info().host + \
-                 ":" + str(transport.info().port)
+    my_sip_uri = "sip:" + transport.info().host + ":" + str(transport.info().port)
 
     # Menu loop
     while True:
         print "My SIP URI is", my_sip_uri
         input = GPIO.input(BUTTON)
-#        input = sys.stdin.readline().rstrip("\r\n")
         if input :
             lck = lib.auto_lock()
-            current_call = make_call(address = args.clienta)
+            current_call = make_call(address = args.client)
             del lck
+            
+        else:
+            os.system('python copylog.py')
 
 
     # Shutdown the library
